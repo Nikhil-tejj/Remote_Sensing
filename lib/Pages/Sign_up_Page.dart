@@ -217,8 +217,8 @@
 //   }
 // }
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'PhoneVerificationPage.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -237,11 +237,42 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Firebase instance
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  Future<void> sendOtp(String phoneNumber) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.29.241:5000/send-otp'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'phoneNumber': phoneNumber}),
+    );
 
-  // Store verification ID for OTP verification
-  String? _verificationId;
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhoneVerificationPage(phoneNumber: phoneNumber),
+        ),
+      );
+    } else {
+      _showErrorDialog('Failed to send OTP. Please try again.');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -362,28 +393,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Password field
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
                 // Submit button to register user
                 ElevatedButton(
-                  onPressed: _sendOTP, // Send OTP when pressed
+                  onPressed: () {
+                    sendOtp(_phoneController.text);
+                  },
                   child: const Text('Submit'),
                 ),
               ],
@@ -392,101 +406,5 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
-  }
-
-  // Step 1: Send OTP to the phone number
-  Future<void> _sendOTP() async {
-    final phoneNumber = _phoneController.text.trim(); // Get the phone number
-
-    if (phoneNumber.isNotEmpty) {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber:
-            '+$phoneNumber', // Add country code (replace with the relevant country code)
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-verification for Android devices
-          await FirebaseAuth.instance.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          // If verification fails
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Failed to verify phone number: ${e.message}'),
-          ));
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          // OTP successfully sent
-          setState(() {
-            _verificationId = verificationId; // Store verification ID
-          });
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  PhoneVerificationPage(verificationId: verificationId),
-            ),
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          print('Auto retrieval timeout: $verificationId');
-        },
-      );
-    } else {
-      // Show error if phone number is empty
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please enter a valid phone number'),
-      ));
-    }
-  }
-
-  // Step 2: Register the user (after OTP verification)
-  Future<void> _registerUser(String otp) async {
-    try {
-      String firstName = _firstNameController.text.trim();
-      String lastName = _lastNameController.text.trim();
-      String username = _usernameController.text.trim();
-      String phone = _phoneController.text.trim();
-      String address = _addressController.text.trim();
-      String password = _passwordController.text.trim();
-
-      // Create credential from OTP and verification ID
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: _verificationId!,
-        smsCode: otp,
-      );
-
-      // Sign in the user with the credential
-      await _auth.signInWithCredential(credential);
-
-      // Fake email for Firebase sign-up (since we don't use real email here)
-      String fakeEmail = "$username@yourapp.com";
-
-      // Register the user with Firebase using fake email and password
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: fakeEmail,
-        password: password,
-      );
-
-      // Store additional user details in Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user?.uid)
-          .set({
-        'firstName': firstName,
-        'lastName': lastName,
-        'username': username,
-        'phone': phone,
-        'address': address,
-      });
-
-      // Navigate to home or success page
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('User registered successfully!'),
-      ));
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
   }
 }

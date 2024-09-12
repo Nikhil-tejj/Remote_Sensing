@@ -86,12 +86,14 @@
 //   }
 // }
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'EmailInputPage.dart';
 
 class PhoneVerificationPage extends StatefulWidget {
-  final String verificationId;
+  final String phoneNumber;
 
-  const PhoneVerificationPage({Key? key, required this.verificationId})
+  const PhoneVerificationPage({Key? key, required this.phoneNumber})
       : super(key: key);
 
   @override
@@ -101,6 +103,43 @@ class PhoneVerificationPage extends StatefulWidget {
 class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   final TextEditingController _otpController =
       TextEditingController(); // OTP input field controller
+
+  Future<void> verifyOtp(String phoneNumber, String otp) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.29.241:5000/verify-otp'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'phoneNumber': phoneNumber, 'otp': otp}),
+    );
+
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmailInputPage(),
+        ),
+      );
+    } else {
+      _showErrorDialog('Failed to verify OTP. Please try again.');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,45 +164,14 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
 
             // Button to verify OTP
             ElevatedButton(
-              onPressed: _verifyOTP, // Verify OTP when button is pressed
+              onPressed: () {
+                verifyOtp(widget.phoneNumber, _otpController.text);
+              },
               child: const Text('Verify OTP'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  // Method to verify the entered OTP
-  Future<void> _verifyOTP() async {
-    String otp = _otpController.text.trim(); // Get the entered OTP
-    if (otp.isNotEmpty) {
-      // Create a PhoneAuthCredential using the verification ID and OTP
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: widget.verificationId,
-        smsCode: otp,
-      );
-
-      try {
-        // Sign in the user with the OTP credential
-        await FirebaseAuth.instance.signInWithCredential(credential);
-        // OTP verification successful, navigate to a success page
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Phone number verified successfully'),
-        ));
-        // Navigate to the next page after verification (e.g., home page)
-        Navigator.pushReplacementNamed(context, '/home');
-      } catch (e) {
-        print('Failed to verify OTP: $e');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Failed to verify OTP: ${e.toString()}'),
-        ));
-      }
-    } else {
-      // Show an error if OTP is not entered
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please enter the OTP'),
-      ));
-    }
   }
 }
