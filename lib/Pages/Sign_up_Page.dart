@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart'; // For TextInputFormatter
 import 'PhoneVerificationPage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -21,8 +22,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> sendOtp(String phoneNumber) async {
-
-     // Load IP from the .env file
+    // Load IP from the .env file
     final serverIp = dotenv.env['SERVER_IP'];
 
     // Ensure the phone number starts with +91
