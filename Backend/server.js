@@ -46,7 +46,7 @@ app.post('/send-otp', (req, res) => {
 app.post('/verify-otp', (req, res) => {
   const { phoneNumber, otp } = req.body;
 
-  client.verify.services(verifyServiceSid)
+  client.verify.v2.services(verifyServiceSid)
     .verificationChecks.create({
       to: phoneNumber,
       code: otp,
@@ -63,5 +63,5 @@ app.post('/verify-otp', (req, res) => {
 
 // Use HTTP for debugging
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on http://192.168.29.241:${port}`);
+  console.log(`Server running on http://${process.env.SERVER_IP}:${port}`);
 });

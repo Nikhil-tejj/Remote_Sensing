@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
-                  labelText: 'Usernamee',
+                  labelText: 'Username',
                   labelStyle: TextStyle(color: Colors.white),
                   // Label text color
                   border: OutlineInputBorder(
@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       TextSpan(
                         text: 'New User ? Click on ',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 0, 0, 0),
+                          color: Color.fromARGB(255, 255, 255, 255),
                           fontSize: 18.0, // Increase the font size here
                           fontWeight: FontWeight.bold, // Make the text bold
                         ),

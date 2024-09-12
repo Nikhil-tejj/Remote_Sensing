@@ -1,226 +1,9 @@
-// import 'package:flutter/material.dart';
-// import 'PhoneVerificationPage.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-
-// class SignUpPage extends StatefulWidget {
-//   const SignUpPage({super.key});
-
-//   @override
-//   State<SignUpPage> createState() => _SignUpPageState();
-// }
-
-// class _SignUpPageState extends State<SignUpPage> {
-//   // Text editing controllers for the sign-up fields
-//   final TextEditingController _firstNameController = TextEditingController();
-//   final TextEditingController _lastNameController = TextEditingController();
-//   final TextEditingController _usernameController = TextEditingController();
-//   final TextEditingController _addressController = TextEditingController();
-//   final TextEditingController _phoneController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-
-//   // Firebase instance
-//   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // Get the height and width of the screen
-//     final mediaQuery = MediaQuery.of(context);
-//     final screenHeight = mediaQuery.size.height;
-//     final screenWidth = mediaQuery.size.width;
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Sign Up'),
-//         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-//       ),
-//       body: SafeArea(
-//         child: SingleChildScrollView(
-//           child: Container(
-//             padding: const EdgeInsets.all(16.0),
-//             constraints: BoxConstraints(
-//               minHeight: screenHeight,
-//             ),
-//             decoration: const BoxDecoration(
-//               image: DecorationImage(
-//                 image: AssetImage('assets/Background.jpg'),
-//                 fit: BoxFit.cover,
-//               ),
-//             ),
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 // First name field
-//                 TextField(
-//                   controller: _firstNameController,
-//                   style: const TextStyle(color: Colors.white),
-//                   decoration: const InputDecoration(
-//                     labelText: 'First Name',
-//                     labelStyle: TextStyle(color: Colors.white),
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 // Last name field
-//                 TextField(
-//                   controller: _lastNameController,
-//                   style: const TextStyle(color: Colors.white),
-//                   decoration: const InputDecoration(
-//                     labelText: 'Last Name',
-//                     labelStyle: TextStyle(color: Colors.white),
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 // Username field
-//                 TextField(
-//                   controller: _usernameController,
-//                   style: const TextStyle(color: Colors.white),
-//                   decoration: const InputDecoration(
-//                     labelText: 'Username',
-//                     labelStyle: TextStyle(color: Colors.white),
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 // Address field
-//                 TextField(
-//                   controller: _addressController,
-//                   style: const TextStyle(color: Colors.white),
-//                   decoration: const InputDecoration(
-//                     labelText: 'Address',
-//                     labelStyle: TextStyle(color: Colors.white),
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 // Phone number field
-//                 TextField(
-//                   controller: _phoneController,
-//                   keyboardType: TextInputType.phone,
-//                   style: const TextStyle(color: Colors.white),
-//                   decoration: const InputDecoration(
-//                     labelText: 'Phone Number',
-//                     labelStyle: TextStyle(color: Colors.white),
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 // Password field
-//                 TextField(
-//                   controller: _passwordController,
-//                   obscureText: true,
-//                   style: const TextStyle(color: Colors.white),
-//                   decoration: const InputDecoration(
-//                     labelText: 'Password',
-//                     labelStyle: TextStyle(color: Colors.white),
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                     enabledBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.white),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 // Submit button to register user
-//                 ElevatedButton(
-//                   onPressed: _registerUser,
-//                   child: const Text('Submit'),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Future<void> _registerUser() async {
-//     try {
-//       String firstName = _firstNameController.text.trim();
-//       String lastName = _lastNameController.text.trim();
-//       String username = _usernameController.text.trim();
-//       String phone = _phoneController.text.trim();
-//       String address = _addressController.text.trim();
-//       String password = _passwordController.text.trim();
-
-//       // Firebase authentication doesn't support direct username-based sign up, so you can use email field as placeholder.
-//       String fakeEmail = "$username@yourapp.com";
-
-//       // Register user with Firebase Email and Password (using username as a placeholder email)
-//       UserCredential userCredential =
-//           await _auth.createUserWithEmailAndPassword(
-//         email: fakeEmail,
-//         password: password,
-//       );
-
-//       // Store additional details in Firestore
-//       await FirebaseFirestore.instance
-//           .collection('users')
-//           .doc(userCredential.user?.uid)
-//           .set({
-//         'firstName': firstName,
-//         'lastName': lastName,
-//         'username': username,
-//         'phone': phone,
-//         'address': address,
-//       });
-
-//       // Navigate to phone verification page
-//       Navigator.push(
-//         context,
-//         MaterialPageRoute(builder: (context) => const PhoneVerificationPage()),
-//       );
-//     } catch (e) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Error: $e')),
-//       );
-//     }
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart'; // For TextInputFormatter
 import 'PhoneVerificationPage.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -238,8 +21,17 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> sendOtp(String phoneNumber) async {
+
+     // Load IP from the .env file
+    final serverIp = dotenv.env['SERVER_IP'];
+
+    // Ensure the phone number starts with +91
+    if (!phoneNumber.startsWith('+91')) {
+      phoneNumber = '+91' + phoneNumber;
+    }
+
     final response = await http.post(
-      Uri.parse('http://192.168.29.241:5000/send-otp'),
+      Uri.parse('http://$serverIp:5000/send-otp'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'phoneNumber': phoneNumber}),
     );
@@ -303,95 +95,51 @@ class _SignUpPageState extends State<SignUpPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // First name field
-                TextField(
+                _buildTextField(
                   controller: _firstNameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'First Name',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
+                  labelText: 'First Name',
                 ),
-                const SizedBox(height: 16),
-
                 // Last name field
-                TextField(
+                _buildTextField(
                   controller: _lastNameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Last Name',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
+                  labelText: 'Last Name',
                 ),
-                const SizedBox(height: 16),
 
                 // Username field
-                TextField(
+                _buildTextField(
                   controller: _usernameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
+                  labelText: 'Username',
                 ),
-                const SizedBox(height: 16),
 
                 // Address field
-                TextField(
+                _buildTextField(
                   controller: _addressController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
+                  labelText: 'Address',
                 ),
-                const SizedBox(height: 16),
 
-                // Phone number field
-                TextField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                // Phone number field with +91 prefix
+                Row(
+                  children: [
+                    const Text(
+                      '+91',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _phoneController,
+                        labelText: 'Phone Number',
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter
+                              .digitsOnly, // Allow only digits
+                          LengthLimitingTextInputFormatter(
+                              10), // Limit to 10 digits
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 16),
 
                 // Submit button to register user
                 ElevatedButton(
@@ -405,6 +153,42 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         ),
       ),
+    );
+  }
+
+  // Helper method to create a common InputDecoration
+  InputDecoration _buildInputDecoration(String labelText) {
+    return InputDecoration(
+      labelText: labelText,
+      labelStyle: const TextStyle(color: Colors.white),
+      border: const OutlineInputBorder(),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white),
+      ),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white),
+      ),
+    );
+  }
+
+  // Helper method to create a common TextField
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters, // Add inputFormatters here
+  }) {
+    return Column(
+      children: [
+        TextField(
+          controller: controller,
+          style: const TextStyle(color: Colors.white),
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters, // Use inputFormatters here
+          decoration: _buildInputDecoration(labelText),
+        ),
+        const SizedBox(height: 16),
+      ],
     );
   }
 }
