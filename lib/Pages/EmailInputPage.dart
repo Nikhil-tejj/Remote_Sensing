@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_otp/email_otp.dart';
@@ -6,7 +5,22 @@ import 'Email_verification.dart';
 import 'CommonBackground.dart';
 
 class EmailInputPage extends StatefulWidget {
-  const EmailInputPage({super.key});
+  // const EmailInputPage({super.key});
+
+  final String firstName;
+  final String lastName;
+  final String username;
+  final String address;
+  final String phoneNumber;
+
+  const EmailInputPage({
+    Key? key,
+    required this.firstName,
+    required this.lastName,
+    required this.username,
+    required this.address,
+    required this.phoneNumber,
+  }) : super(key: key);
 
   @override
   State<EmailInputPage> createState() => _EmailInputPageState();
@@ -15,23 +29,6 @@ class EmailInputPage extends StatefulWidget {
 class _EmailInputPageState extends State<EmailInputPage> {
   final TextEditingController _emailController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<void> _addUserToFirestore(String email) async {
-    try {
-      await _firestore.collection('users').add({
-        'email': email,
-        'username': 'random_username', // Random fields for now
-        'created_at': DateTime.now(),
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User added to Firestore')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error adding user to Firestore: $e')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +92,12 @@ class _EmailInputPageState extends State<EmailInputPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => EmailVerificationPage(
+                                      firstName: widget.firstName,
+                                      lastName: widget.lastName,
+                                      username: widget.username,
+                                      address: widget.address,
+                                      phoneNumber: widget.phoneNumber,
                                       email: email,
-                                      onVerified: () async {
-                                        await _addUserToFirestore(email);
-                                      },
                                     ),
                                   ),
                                 );

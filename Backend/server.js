@@ -42,6 +42,25 @@ app.post('/send-otp', (req, res) => {
     .catch(error => res.status(500).send({ error: error.message }));
 });
 
+// app.post('/send-otp', (req, res) => {
+//   const { phoneNumber, otp } = req.body;
+
+//   const message = `Your verification code is: ${otp}. Please use this to verify your account.`;
+
+//   client.messages
+//     .create({
+//       body: message,
+//       from: twilioPhoneNumber, // Twilio phone number from which the SMS will be sent
+//       to: phoneNumber,
+//     })
+//     .then(message => {
+//       res.status(200).send({ sid: message.sid, message: 'OTP sent successfully' });
+//     })
+//     .catch(error => {
+//       res.status(500).send({ error: error.message });
+//     });
+// });
+
 // Endpoint to verify OTP using Twilio Verify API
 app.post('/verify-otp', (req, res) => {
   const { phoneNumber, otp } = req.body;

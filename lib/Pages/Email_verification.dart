@@ -1,17 +1,26 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:email_otp/email_otp.dart';
 import 'PasswordCreationPage.dart';
 import 'CommonBackground.dart';
 
 class EmailVerificationPage extends StatefulWidget {
+  // final String email;
+  final String firstName;
+  final String lastName;
+  final String username;
+  final String address;
+  final String phoneNumber;
   final String email;
-  final Future<void> Function()
-      onVerified; // Callback for after OTP verification
 
-  const EmailVerificationPage(
-      {super.key, required this.email, required this.onVerified});
+  const EmailVerificationPage({
+    Key? key,
+    required this.firstName,
+    required this.lastName,
+    required this.username,
+    required this.address,
+    required this.phoneNumber,
+    required this.email,
+  }) : super(key: key);
 
   @override
   State<EmailVerificationPage> createState() => _EmailVerificationPageState();
@@ -19,6 +28,11 @@ class EmailVerificationPage extends StatefulWidget {
 
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
   final TextEditingController _codeController = TextEditingController();
+
+  Future<bool> verifyEmailOtp(String email, String otp) async {
+    bool otpVerified = EmailOTP.verifyOTP(otp: otp);
+    return otpVerified;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,15 +83,18 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                               content: Text('Email verified successfully')),
                         );
 
-                        // Call the onVerified callback after OTP verification
-                        await widget.onVerified();
-
-                        // Navigate to Password Creation Page
+                        // Navigate to Password Creation Page and pass required data
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                PasswordCreationPage(email: widget.email),
+                            builder: (context) => PasswordCreationPage(
+                              email: widget.email,
+                              firstName: widget.firstName,
+                              lastName: widget.lastName,
+                              username: widget.username,
+                              address: widget.address,
+                              phoneNumber: widget.phoneNumber,
+                            ),
                           ),
                         );
                       } else {
@@ -98,4 +115,3 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     );
   }
 }
-

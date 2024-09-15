@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'Sign_up_Page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'WelcomePage.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -12,8 +15,98 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   // Text editing controllers for the text fields
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<String?> _getEmailFromUsername(String username) async {
+    try {
+      // Query the Firestore to find the email based on the entered username
+      QuerySnapshot query = await _firestore
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        return query.docs.first['email'];
+      } else {
+        return null; // Username not found
+      }
+    } catch (e) {
+      return null; // Error occurred
+    }
+  }
+
+  Future<void> _login() async {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+
+    // Get the email associated with the entered username
+    String? email = await _getEmailFromUsername(username);
+
+    if (email != null) {
+      try {
+        // Sign in using Firebase Authentication with the extracted email and password
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+
+        // Navigate to the Welcome Page on successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const WelcomePage()),
+        );
+      } on FirebaseAuthException catch (e) {
+        String message;
+        if (e.code == 'user-not-found') {
+          message = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          message = 'Wrong password provided.';
+        } else {
+          message = 'An error occurred: ${e.message}';
+        }
+        _showErrorMessage(message);
+      }
+    } else {
+      _showErrorMessage('Username not found.');
+    }
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  InputDecoration _buildInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.white),
+      border: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white),
+      ),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      {required TextEditingController controller,
+      required String label,
+      bool obscureText = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
+      decoration: _buildInputDecoration(label),
+      cursorColor: Colors.white,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,72 +132,24 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // TextField for email (username)
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  labelStyle: TextStyle(color: Colors.white),
-                  // Label text color
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Border color
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.white), // Border color when not focused
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.white), // Border color when focused
-                  ),
-                ),
-                style: const TextStyle(color: Colors.white), // Text input color
+              _buildTextField(
+                controller: _usernameController,
+                label: 'Username',
               ),
 
               const SizedBox(height: 16), // Space between fields
 
               // TextField for password
-              TextField(
+              _buildTextField(
                 controller: _passwordController,
+                label: 'Password',
                 obscureText: true,
-                style: const TextStyle(color: Colors.white),
-                // Set text color to white
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: TextStyle(color: Colors.white),
-                  // Set label color to white
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.white), // Set border color to white
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .white), // Set border color to white when focused
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .white), // Set border color to white when enabled
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .white), // Set border color to white when disabled
-                  ),
-                ),
-                cursorColor: Colors.white, // Set cursor color to white
               ),
               const SizedBox(
                   height: 16), // Space between the password field and button
 
               ElevatedButton(
-                onPressed: () {
-                  String email = _emailController.text;
-                  String password = _passwordController.text;
-                  // Do something with the entered email and password
-                  print('Email: $email, Password: $password');
-                },
+                onPressed: _login,
                 child: const Text('Login'),
               ),
               const SizedBox(height: 8),

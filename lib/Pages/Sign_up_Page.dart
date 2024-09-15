@@ -39,8 +39,16 @@ class _SignUpPageState extends State<SignUpPage> {
     if (response.statusCode == 200) {
       Navigator.push(
         context,
+
+
         MaterialPageRoute(
-          builder: (context) => PhoneVerificationPage(phoneNumber: phoneNumber),
+          builder: (context) => PhoneVerificationPage(
+            phoneNumber: phoneNumber,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            username: _usernameController.text,
+            address: _addressController.text,
+          ),
         ),
       );
     } else {

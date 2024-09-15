@@ -8,8 +8,20 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
 class PhoneVerificationPage extends StatefulWidget {
   final String phoneNumber;
 
-  const PhoneVerificationPage({Key? key, required this.phoneNumber})
-      : super(key: key);
+  // final String phoneNumber;
+  final String firstName;
+  final String lastName;
+  final String username;
+  final String address;
+
+  const PhoneVerificationPage({
+    Key? key,
+    required this.phoneNumber,
+    required this.firstName,
+    required this.lastName,
+    required this.username,
+    required this.address,
+  }) : super(key: key);
 
   @override
   _PhoneVerificationPageState createState() => _PhoneVerificationPageState();
@@ -19,7 +31,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   final TextEditingController _otpController =
       TextEditingController(); // OTP input field controller
 
-  Future<void> verifyOtp(String phoneNumber, String otp) async {
+  Future<bool> verifyOtp(String phoneNumber, String otp) async {
     // Load IP from the .env file
     final serverIp = dotenv.env['SERVER_IP'];
     final response = await http.post(
@@ -31,15 +43,24 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
     if (response.statusCode == 200) {
       // OTP verification successful, show success dialog
       _showSuccessDialog();
-      Navigator.push(
+
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => EmailInputPage(),
+          builder: (context) => EmailInputPage(
+            firstName: widget.firstName,
+            lastName: widget.lastName,
+            username: widget.username,
+            address: widget.address,
+            phoneNumber: widget.phoneNumber,
+          ),
         ),
       );
+      return true;
     } else {
       _showErrorDialog('Failed to verify OTP. Please try again.');
     }
+    return false;
   }
 
   void _showErrorDialog(String message) {
@@ -71,11 +92,17 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              // Navigate to the EmailInputPage
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EmailInputPage(),
+                  builder: (context) => EmailInputPage(
+                    firstName: widget.firstName,
+                    lastName: widget.lastName,
+                    username: widget.username,
+                    address: widget.address,
+                    phoneNumber: widget.phoneNumber,
+                  ),
                 ),
               );
             },
