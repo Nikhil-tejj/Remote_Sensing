@@ -12,14 +12,14 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Navigate to the login page after 2 seconds
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 2), () {//callback function.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => const MyHomePage(title: 'Login Page')),
       );
     });
-  }
+  }//init state done.
 
   @override
   Widget build(BuildContext context) {
