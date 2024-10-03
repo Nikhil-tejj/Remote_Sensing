@@ -30,6 +30,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+.metadata
 
 # Symbolication related
 app.*.symbols
@@ -63,3 +64,6 @@ server.key
 # Package manager related
 package-lock.json
 pubspec.lock
+
+# Ignore the model file
+# modelSpecNew.onnx
