@@ -5,20 +5,18 @@ import 'CommonBackground.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   // final String email;
-  final String firstName;
-  final String lastName;
+  // final String firstName;
+  // final String lastName;
   final String username;
-  final String address;
-  final String phoneNumber;
+  // final String address;
   final String email;
 
   const EmailVerificationPage({
     Key? key,
-    required this.firstName,
-    required this.lastName,
+    // required this.firstName,
+    // required this.lastName,
     required this.username,
-    required this.address,
-    required this.phoneNumber,
+    // required this.address,
     required this.email,
   }) : super(key: key);
 
@@ -89,11 +87,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                           MaterialPageRoute(
                             builder: (context) => PasswordCreationPage(
                               email: widget.email,
-                              firstName: widget.firstName,
-                              lastName: widget.lastName,
+                              // firstName: widget.firstName,
+                              // lastName: widget.lastName,
                               username: widget.username,
-                              address: widget.address,
-                              phoneNumber: widget.phoneNumber,
+                              // address: widget.address,
                             ),
                           ),
                         );

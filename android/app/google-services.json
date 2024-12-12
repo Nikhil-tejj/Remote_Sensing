@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "239260696903",
-    "project_id": "remsenseai",
-    "storage_bucket": "remsenseai.appspot.com"
+    "project_number": "956221498033",
+    "project_id": "remsenseai-25786",
+    "storage_bucket": "remsenseai-25786.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:239260696903:android:8e13d37168b99315ce4c62",
+        "mobilesdk_app_id": "1:956221498033:android:ada74ffbac0004c06e7890",
         "android_client_info": {
-          "package_name": "com.example.remote_sensing"
+          "package_name": "com.remsenai.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC8WheWsUCh6_aao43Qk5LHNwd6EDnAimk"
+          "current_key": "AIzaSyDVOpDSaXWC2VpwAu43oeRoWf9BhLF1ERQ"
         }
       ],
       "services": {

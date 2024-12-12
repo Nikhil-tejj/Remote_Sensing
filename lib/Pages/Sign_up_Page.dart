@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter/services.dart'; // For TextInputFormatter
-import 'PhoneVerificationPage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
+import 'EmailInputPage.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -14,72 +10,15 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   // Text editing controllers for the sign-up fields
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+  // final TextEditingController _firstNameController = TextEditingController();
+  // final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  Future<void> sendOtp(String phoneNumber) async {
-    // Load IP from the .env file
-    final serverIp = dotenv.env['SERVER_IP'];
-
-    // Ensure the phone number starts with +91
-    if (!phoneNumber.startsWith('+91')) {
-      phoneNumber = '+91' + phoneNumber;
-    }
-
-    final response = await http.post(
-      Uri.parse('http://$serverIp:5000/send-otp'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phoneNumber': phoneNumber}),
-    );
-
-    if (response.statusCode == 200) {
-      Navigator.push(
-        context,
-
-
-        MaterialPageRoute(
-          builder: (context) => PhoneVerificationPage(
-            phoneNumber: phoneNumber,
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            username: _usernameController.text,
-            address: _addressController.text,
-          ),
-        ),
-      );
-    } else {
-      _showErrorDialog('Failed to send OTP. Please try again.');
-    }
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+  // final TextEditingController _addressController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    // Get the height and width of the screen
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final screenWidth = mediaQuery.size.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -103,56 +42,39 @@ class _SignUpPageState extends State<SignUpPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // First name field
-                _buildTextField(
-                  controller: _firstNameController,
-                  labelText: 'First Name',
-                ),
+                // _buildTextField(
+                //   controller: _firstNameController,
+                //   labelText: 'First Name',
+                // ),
                 // Last name field
-                _buildTextField(
-                  controller: _lastNameController,
-                  labelText: 'Last Name',
-                ),
-
+                // _buildTextField(
+                //   controller: _lastNameController,
+                //   labelText: 'Last Name',
+                // ),
                 // Username field
                 _buildTextField(
                   controller: _usernameController,
                   labelText: 'Username',
                 ),
-
                 // Address field
-                _buildTextField(
-                  controller: _addressController,
-                  labelText: 'Address',
-                ),
-
-                // Phone number field with +91 prefix
-                Row(
-                  children: [
-                    const Text(
-                      '+91',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _buildTextField(
-                        controller: _phoneController,
-                        labelText: 'Phone Number',
-                        keyboardType: TextInputType.phone,
-                        inputFormatters: [
-                          FilteringTextInputFormatter
-                              .digitsOnly, // Allow only digits
-                          LengthLimitingTextInputFormatter(
-                              10), // Limit to 10 digits
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Submit button to register user
+                // _buildTextField(
+                //   controller: _addressController,
+                //   labelText: 'Address',
+                // ),
+                // Submit button to navigate to email input
                 ElevatedButton(
                   onPressed: () {
-                    sendOtp(_phoneController.text);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EmailInputPage(
+                          // firstName: _firstNameController.text,
+                          // lastName: _lastNameController.text,
+                          username: _usernameController.text,
+                          // address: _addressController.text,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Submit'),
                 ),
@@ -183,16 +105,12 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
-    TextInputType? keyboardType,
-    List<TextInputFormatter>? inputFormatters, // Add inputFormatters here
   }) {
     return Column(
       children: [
         TextField(
           controller: controller,
           style: const TextStyle(color: Colors.white),
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters, // Use inputFormatters here
           decoration: _buildInputDecoration(labelText),
         ),
         const SizedBox(height: 16),

@@ -6,20 +6,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class PasswordCreationPage extends StatefulWidget {
   final String email;
-  final String firstName;
-  final String lastName;
+  // final String firstName;
+  // final String lastName;
   final String username;
-  final String address;
-  final String phoneNumber;
+  // final String address;
+  // final String phoneNumber;
 
   const PasswordCreationPage({
     Key? key,
     required this.email,
-    required this.firstName,
-    required this.lastName,
+    // required this.firstName,
+    // required this.lastName,
     required this.username,
-    required this.address,
-    required this.phoneNumber,
+    // required this.address,
+    // required this.phoneNumber,
   }) : super(key: key);
 
   @override
@@ -45,11 +45,11 @@ class _PasswordCreationPageState extends State<PasswordCreationPage> {
       // Once the user is created, store additional user details in Firestore
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': widget.email,
-        'firstName': widget.firstName,
-        'lastName': widget.lastName,
+        // 'firstName': widget.firstName,
+        // 'lastName': widget.lastName,
         'username': widget.username,
-        'address': widget.address,
-        'phoneNumber': widget.phoneNumber,
+        // 'address': widget.address,
+        // 'phoneNumber': widget.phoneNumber,
         'created_at': DateTime.now(),
       });
 

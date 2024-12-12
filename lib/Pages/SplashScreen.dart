@@ -12,21 +12,22 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Navigate to the login page after 2 seconds
-    Future.delayed(Duration(seconds: 2), () {//callback function.
+    Future.delayed(Duration(seconds: 2), () {
+      //callback function.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => const MyHomePage(title: 'Login Page')),
+            builder: (context) => const MyHomePage(title: 'Remote Sensing GenAI')),
       );
     });
-  }//init state done.
+  } //init state done.
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white, // Change background color if needed
       body: Center(
-        child: Image.asset('assets/logo.png',
+        child: Image.asset('assets/icon.jpg',
             width: 150, height: 150), // Replace with your logo
       ),
     );

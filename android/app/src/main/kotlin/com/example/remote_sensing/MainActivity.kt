@@ -1,4 +1,4 @@
-package com.example.remote_sensing
+package com.remsenai.app
 
 import io.flutter.embedding.android.FlutterActivity
 

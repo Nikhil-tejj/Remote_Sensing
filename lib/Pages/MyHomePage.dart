@@ -3,6 +3,7 @@ import 'Sign_up_Page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'WelcomePage.dart';
+import 'OptionsPage.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -55,7 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // Navigate to the Welcome Page on successful login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const WelcomePage()),
+          // MaterialPageRoute(builder: (context) => const WelcomePage()),
+          MaterialPageRoute(builder: (context) => const OptionsPage()),
         );
       } on FirebaseAuthException catch (e) {
         String message;
@@ -121,9 +123,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           height: mediaQuery.size.height, // Makes it fill the available space
           decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/Background.jpg'),
-              fit: BoxFit.cover, // Better suited for full background images
+            gradient: LinearGradient(
+              colors: [Color.fromARGB(255, 119, 169, 147), Color.fromARGB(255, 116, 99, 99)], // Gradient colors
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
           padding:
@@ -177,8 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       TextSpan(
                         text: 'Sign Up',
                         style: TextStyle(
-                          color: Color.fromARGB(
-                              255, 255, 255, 255), // Color for the link
+                          color: Color.fromARGB(255, 204, 238, 32), // Color for the link
                           decoration: TextDecoration
                               .underline, // Underline the 'Sign Up' text
                           fontSize: 18.0, // Increase the font size here

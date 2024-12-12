@@ -7,19 +7,17 @@ import 'CommonBackground.dart';
 class EmailInputPage extends StatefulWidget {
   // const EmailInputPage({super.key});
 
-  final String firstName;
-  final String lastName;
+  // final String firstName;
+  // final String lastName;
   final String username;
-  final String address;
-  final String phoneNumber;
+  // final String address;
 
   const EmailInputPage({
     Key? key,
-    required this.firstName,
-    required this.lastName,
+    // required this.firstName,
+    // required this.lastName,
     required this.username,
-    required this.address,
-    required this.phoneNumber,
+    // required this.address,
   }) : super(key: key);
 
   @override
@@ -92,11 +90,10 @@ class _EmailInputPageState extends State<EmailInputPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => EmailVerificationPage(
-                                      firstName: widget.firstName,
-                                      lastName: widget.lastName,
+                                      // firstName: widget.firstName,
+                                      // lastName: widget.lastName,
                                       username: widget.username,
-                                      address: widget.address,
-                                      phoneNumber: widget.phoneNumber,
+                                      // address: widget.address,
                                       email: email,
                                     ),
                                   ),

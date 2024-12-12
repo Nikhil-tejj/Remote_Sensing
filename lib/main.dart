@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'RemSenseAI',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF121C38)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 145, 223, 216)),
         useMaterial3: true,
       ),
       home: SplashScreen(),
