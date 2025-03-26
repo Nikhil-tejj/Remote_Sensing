@@ -1,15 +1,20 @@
 {
   "dependencies": {
+    "@techstark/opencv-js": "^4.10.0-release.1",
+    "axios": "^1.7.7",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
+    "mongoose": "^8.10.1",
+    "mongoose-sequence": "^6.0.1",
     "multer": "^1.4.5-lts.1",
     "onnxruntime-node": "^1.19.2",
     "sharp": "^0.33.5",
-    "twilio": "^5.3.0"
+    "twilio": "^5.3.0",
+    "ws": "^8.18.0"
   },
   "name": "remote_sensing",
   "description": "A new Flutter project.",

@@ -1,6 +1,8 @@
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -14,6 +16,7 @@ class CropUsingVitPage extends StatefulWidget {
 class _CropUsingVitPageState extends State<CropUsingVitPage> {
   File? _image; // Variable to hold the picked image
   String? _prediction; // To hold the prediction result
+  bool _imageSelected = false; // Flag to track if an image is selected
 
   // Pick Image from the gallery
   Future<void> _pickImage() async {
@@ -25,7 +28,9 @@ class _CropUsingVitPageState extends State<CropUsingVitPage> {
       if (pickedImage != null) {
         setState(() {
           _image = File(pickedImage.path); // Update _image state
+          _imageSelected = true; // Set flag to true
         });
+        print('Image selected: ${_image!.path}'); // Debugging line
       }
     } catch (e) {
       print("Error picking image: $e");
@@ -34,15 +39,23 @@ class _CropUsingVitPageState extends State<CropUsingVitPage> {
 
   // Upload Image to the server for prediction
   Future<void> _uploadImage() async {
+    final serverIp = dotenv.env['SERVER_IP'];
+    final port = dotenv.env['PORT'];
     if (_image == null) {
       print('No image to upload');
       return;
     }
 
+    if (serverIp == null || port == null) {
+      print('Server IP or port is not set in the environment variables.');
+      return;
+    }
+
     String base64Image = base64Encode(_image!.readAsBytesSync());
     try {
+      print('Uploading image: ${_image!.path}'); // Debugging line
       var response = await http.post(
-        Uri.parse('http://192.168.218.177:3012/predictVit'),
+        Uri.parse('http://$serverIp:$port/predictvit'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -50,6 +63,9 @@ class _CropUsingVitPageState extends State<CropUsingVitPage> {
           'image': base64Image,
         }),
       );
+
+      print('Response status: ${response.statusCode}'); // Debugging line
+      print('Response body: ${response.body}'); // Debugging line
 
       if (response.statusCode == 200) {
         var resBody = json.decode(response.body);
@@ -62,6 +78,7 @@ class _CropUsingVitPageState extends State<CropUsingVitPage> {
         });
       }
     } catch (e) {
+      print('Error uploading image: $e'); // Debugging line
       setState(() {
         _prediction = 'Error uploading image: $e';
       });
@@ -73,7 +90,7 @@ class _CropUsingVitPageState extends State<CropUsingVitPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ViT Crop Classification'),
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: const Color.fromARGB(255, 108, 243, 191),
       ),
       body: Stack(
         children: [
@@ -115,23 +132,24 @@ class _CropUsingVitPageState extends State<CropUsingVitPage> {
                       ),
                     ),
                   const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: _pickImage,
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Select Image from Gallery'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade600,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                  if (!_imageSelected) // Conditionally render the button
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_library),
+                      label: const Text('Select Image from Gallery'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 166, 253, 170),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: _uploadImage,
                     icon: const Icon(Icons.cloud_upload),
                     label: const Text('Upload and Predict'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade600,
+                      backgroundColor: const Color.fromARGB(255, 160, 206, 246),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),
                     ),

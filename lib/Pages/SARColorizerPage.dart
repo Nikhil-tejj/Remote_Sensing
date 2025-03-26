@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -36,30 +37,54 @@ class _SARColorizerPageState extends State<SARColorizerPage> {
 
   Future<void> _uploadImage() async {
     final serverIP = dotenv.env['SERVER_IP'];
-    if (_image == null) {
-      print('No image to upload'); // Debugging line
+    final port = dotenv.env['PORT'];
+  
+    if (serverIP == null || port == null) {
+      print('Server IP or port is not set in the environment variables.');
       return;
     }
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('http://${serverIP}:5000/colorize'));
-    request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
+    if (_image == null) {
+      print('No image to upload');
+      return;
+    }
 
-    var response = await request.send();
+    try {
+      // Convert image to base64
+      final bytes = await _image!.readAsBytes();
+      final base64Image = base64Encode(bytes);
+      print('Uploading image: ${_image!.path}'); // Debugging line
 
-    if (response.statusCode == 200) {
-      var bytes = await response.stream.toBytes();
-      final tempDir = await getTemporaryDirectory();
-      final tempFile = File('${tempDir.path}/colorized_image.png');
-      await tempFile.writeAsBytes(bytes);
+      // Send the base64 image in the request body
+      final response = await http.post(
+        Uri.parse('http://$serverIP:$port/colorize'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'image': base64Image}),
+      );
 
-      setState(() {
-        _colorizedImage = tempFile;
-        _showAssetImage = true;
-        print('Colorized image received'); // Debugging line
-      });
-    } else {
-      print('Error: ${response.statusCode}'); // Debugging line
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        final colorizedImageBase64 = responseBody['colorizedImage'];
+        final bytes = base64Decode(colorizedImageBase64);
+        final tempDir = await getTemporaryDirectory();
+        final tempFile = File('${tempDir.path}/colorized_image.png');
+        await tempFile.writeAsBytes(bytes);
+
+        setState(() {
+          _colorizedImage = tempFile;
+          _showAssetImage = true;
+          print('Colorized image received');
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        setState(() {
+          _colorizedImage = null;
+          _showAssetImage = false;
+        });
+      }
+    } catch (e) {
+      print('Failed to upload image: $e');
       setState(() {
         _colorizedImage = null;
         _showAssetImage = false;
@@ -103,12 +128,12 @@ class _SARColorizerPageState extends State<SARColorizerPage> {
               const Text(
                 'SAR Image Colorizer',
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 11),
               _image == null
                   ? const Text(
                       '',
@@ -119,7 +144,7 @@ class _SARColorizerPageState extends State<SARColorizerPage> {
                       height: 200,
                       width: 200,
                     ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _image == null
                   ? ElevatedButton(
                       onPressed: _pickImage,
@@ -160,7 +185,7 @@ class _SARColorizerPageState extends State<SARColorizerPage> {
                         const Text(
                           'Generated Image',
                           style: TextStyle(
-                            fontSize: 25,
+                            fontSize:19,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -170,11 +195,11 @@ class _SARColorizerPageState extends State<SARColorizerPage> {
                           height: 180,
                           width: 190,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 6),
                         const Text(
                           'Ground Truth Image',
                           style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 19,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -188,6 +213,15 @@ class _SARColorizerPageState extends State<SARColorizerPage> {
                             : Container(),
                       ],
                     ),
+              const SizedBox(height: 10),
+              const Text(
+                'FID score: 370',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ],
           ),
         ),
