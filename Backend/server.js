@@ -21,10 +21,6 @@ let vitSession;
 const app = express();
 const port = process.env.PORT || 5000;
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
-
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" })); 
 app.use(bodyParser.json()); 
@@ -342,14 +338,16 @@ app.post("/predictvit", async (req, res) => {
 
 const upload = multer();
 
-app.post("/predict", upload.single("image"), async (req, res) => {
-  if (!req.file) {
+// Endpoint for predicting crop type
+app.post("/predict", async (req, res) => {
+  const base64Image = req.body.image;
+  if (!base64Image) {
     return res.status(400).send("No image provided");
   }
 
   try {
-    // Decode the uploaded file
-    const imageBuffer = req.file.buffer;
+    // Decode Base64 image
+    const imageBuffer = Buffer.from(base64Image, "base64");
     console.log("Image received, processing..."); // Debugging line
 
     // Preprocess image and run model
@@ -363,29 +361,6 @@ app.post("/predict", upload.single("image"), async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-// Endpoint for predicting crop type
-// app.post("/predict", async (req, res) => {
-//   const base64Image = req.body.image;
-//   if (!base64Image) {
-//     return res.status(400).send("No image provided");
-//   }
-
-//   try {
-//     // Decode Base64 image
-//     const imageBuffer = Buffer.from(base64Image, "base64");
-//     console.log("Image received, processing..."); // Debugging line
-
-//     // Preprocess image and run model
-//     const imageTensor = await preprocessImage(imageBuffer);
-//     const prediction = await runModel(imageTensor);
-
-//     // Return prediction
-//     res.status(200).send({ crop: prediction });
-//   } catch (error) {
-//     console.error("Error in /predict route:", error);
-//     res.status(500).send({ error: error.message });
-//   }
-// });
 
 // New functions for SAR2RGB model
 
@@ -521,76 +496,6 @@ app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.send("Hello, World! The server is running.");
-});
-
-// Endpoint to send OTP via SMS using Twilio Verify API with Axios
-app.post("/send-otp", async (req, res) => {
-  const { phoneNumber } = req.body;
-
-  const url = `https://verify.twilio.com/v2/Services/${verifyServiceSid}/Verifications`;
-
-  const data = new URLSearchParams({
-    To: phoneNumber,
-    Channel: "sms",
-  });
-
-  const auth = {
-    username: accountSid,
-    password: authToken,
-  };
-
-  try {
-    const response = await axios.post(url, data.toString(), {
-      auth,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    res.status(200).send({ sid: response.data.sid });
-  } catch (error) {
-    console.error("Error sending OTP:", error.response?.data || error.message);
-    res.status(500).send({ error: error.message });
-  }
-});
-
-// Endpoint to verify OTP using Twilio Verify API with Axios
-app.post("/verify-otp", async (req, res) => {
-  const { phoneNumber, otp } = req.body;
-
-  const url = `https://verify.twilio.com/v2/Services/${verifyServiceSid}/VerificationCheck`;
-
-  const data = new URLSearchParams({
-    To: phoneNumber,
-    Code: otp,
-  });
-
-  const auth = {
-    username: accountSid,
-    password: authToken,
-  };
-
-  try {
-    const response = await axios.post(url, data.toString(), {
-      auth,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    const verificationCheck = response.data;
-    if (verificationCheck.status === "approved") {
-      res.status(200).send({ message: "OTP verified successfully" });
-    } else {
-      res.status(400).send({ message: "Invalid OTP" });
-    }
-  } catch (error) {
-    console.error(
-      "Error verifying OTP:",
-      error.response?.data || error.message
-    );
-    res.status(500).send({ error: error.message });
-  }
 });
 
 // Use HTTP for debugging
